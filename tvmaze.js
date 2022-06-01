@@ -21,15 +21,28 @@ async function getShowsByTerm(term) {
   console.log(response.data[0].show.name);
 
   // let json = JSON.stringify(response)
+  let showData = response.data;
+  let showsList = [];
 
-  return [
-    {
-      id: response.data[0].show.id,
-      name: response.data[0].show.name,
-      summary: response.data[0].show.summary,
-      image: response.data[0].show.image.medium,
-    },
-  ];
+  //refactor to use map
+  for (let show in showData) {
+    showsList.push({
+      id: response.data[show].show.id,
+      name: response.data[show].show.name,
+      summary: response.data[show].show.summary,
+      image: response.data[show].show.image.medium,
+    });
+  }
+  console.log(showsList);
+  return showsList;
+  // return [
+  //   {
+  //     id: response.data[0].show.id,
+  //     name: response.data[0].show.name,
+  //     summary: response.data[0].show.summary,
+  //     image: response.data[0].show.image.medium,
+  //   },
+  // ];
 }
 
 /** Given list of shows, create markup for each and to DOM */
