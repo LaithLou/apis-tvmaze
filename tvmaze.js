@@ -107,8 +107,13 @@ $searchForm.on("submit", async function (evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
-
+async function getEpisodesOfShow(id) {
+  const response = await axios.get(`http://api.tvmaze.com/shows/1234/episodes`);
+  console.log(response);
+  return;
+}
 /** Write a clear docstring for this function... */
 
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) {
+
+}
