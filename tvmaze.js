@@ -26,12 +26,23 @@ async function getShowsByTerm(term) {
 
   //refactor to use map
   for (let show in showData) {
-    showsList.push({
-      id: response.data[show].show.id,
-      name: response.data[show].show.name,
-      summary: response.data[show].show.summary,
-      image: response.data[show].show.image.medium,
-    });
+    console.log(showData[show].show.image);
+    if (showData[show].show.image === null) {
+      showsList.push({
+        id: showData[show].show.id,
+        name: showData[show].show.name,
+        summary: showData[show].show.summary,
+        image: "https://tinyurl.com/tv-missing",
+      });
+    }
+    else {
+      showsList.push({
+        id: showData[show].show.id,
+        name: showData[show].show.name,
+        summary: showData[show].show.summary,
+        image: showData[show].show.image.medium,
+      });
+    }
   }
   console.log(showsList);
   return showsList;
@@ -57,6 +68,7 @@ function populateShows(shows) {
            <img
               src=${show.image}
               alt=${show.name}
+              // alt="http://tinyurl.com/tv-missing"
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
