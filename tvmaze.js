@@ -14,11 +14,10 @@ const TV_MAZE_API = "http://api.tvmaze.com/";
 
 async function getShowsByTerm(term) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
-  console.log("click");
+
   const response = await axios.get(`${TV_MAZE_API}search/shows`, {
     params: { q: term },
   });
-  console.log(response.data[0].show.name);
 
   // let json = JSON.stringify(response)
   let showData = response.data;
@@ -26,7 +25,7 @@ async function getShowsByTerm(term) {
 
   //refactor to use map
   for (let show in showData) {
-    console.log(showData[show].show.image);
+    //ternery for image.
     if (showData[show].show.image === null) {
       showsList.push({
         id: showData[show].show.id,
@@ -34,8 +33,7 @@ async function getShowsByTerm(term) {
         summary: showData[show].show.summary,
         image: "https://tinyurl.com/tv-missing",
       });
-    }
-    else {
+    } else {
       showsList.push({
         id: showData[show].show.id,
         name: showData[show].show.name,
@@ -44,7 +42,7 @@ async function getShowsByTerm(term) {
       });
     }
   }
-  console.log(showsList);
+
   return showsList;
   // return [
   //   {
@@ -68,12 +66,11 @@ function populateShows(shows) {
            <img
               src=${show.image}
               alt=${show.name}
-              // alt="http://tinyurl.com/tv-missing"
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
              <div><small>${show.summary}</small></div>
-             <button class="btn btn-outline-light btn-sm Show-getEpisodes">
+             <button class="btn btn-outline-light btn-sm Show-getEpisodes episodes-btn">
                Episodes
              </button>
            </div>
@@ -93,7 +90,7 @@ function populateShows(shows) {
 async function searchForShowAndDisplay() {
   const term = $("#searchForm-term").val();
   const shows = await getShowsByTerm(term);
-
+  getEpisodesOfShow(shows.id);
   $episodesArea.hide();
   populateShows(shows);
 }
@@ -103,17 +100,49 @@ $searchForm.on("submit", async function (evt) {
   await searchForShowAndDisplay();
 });
 
+// let episodes = getEpisodesOfShow(shows.id);
+console.log($(".episodes-btn"));
+$("#showsList").on("click", ".episodes-btn", populateEpisodes);
+
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
 
 async function getEpisodesOfShow(id) {
-  const response = await axios.get(`http://api.tvmaze.com/shows/1234/episodes`);
-  console.log(response);
-  return;
+  const response = await axios.get(
+    `http://api.tvmaze.com/shows/${id}/episodes`
+  );
+  let episodeList = [];
+  let responseData = response.data;
+  for (let episode of responseData) {
+    episodeList.push({
+      id: episode.id,
+      name: episode.name,
+      season: episode.season,
+      number: episode.number,
+    });
+  }
+
+  return episodeList;
 }
+
 /** Write a clear docstring for this function... */
 
-function populateEpisodes(episodes) {
+async function populateEpisodes(evt) {
+  evt.preventDefault();
+  const $button = $(evt.target);
+  let id = $button.closest(".Show").attr("data-show-id");
+  console.log(id);
 
+  console.log(evt.target);
+
+  let episodes = await getEpisodesOfShow(id);
+  console.log(episodes);
+  let $episodesList = $("#episodesList");
+  for (let episode of episodes) {
+    $(
+      `<li class='episode'> ${episode.name} (season ${episode.season}, number ${episode.number})</li>`
+    );
+    $(".episode").appendTo($episodesList);
+  }
 }
